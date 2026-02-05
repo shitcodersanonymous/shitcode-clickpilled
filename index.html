@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SHITCODE: OPERATION CLICKPILLED</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    /* Victory-specific animations (needed by victory.js) */
+    @keyframes victory-fall {
+      0% { transform: translateY(-40px); opacity: 1; }
+      100% { transform: translateY(110vh); opacity: 0; }
+    }
+    @keyframes victory-pulse {
+      0% { transform: scale(1); opacity: 0.8; }
+      100% { transform: scale(1.05); opacity: 1; }
+    }
+    @keyframes victory-drift {
+      0% { transform: translate(0, 0) rotate(0deg); }
+      50% { transform: translate(20px, -15px) rotate(3deg); }
+      100% { transform: translate(-10px, 10px) rotate(-2deg); }
+    }
+    @keyframes meme-drift {
+      0% { transform: translate(0, 0); opacity: 0.4; }
+      50% { transform: translate(30px, -20px); opacity: 0.2; }
+      100% { transform: translate(-50px, 50px); opacity: 0; }
+    }
+    /* Unredaction overlay */
+    .unredact-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.95); z-index: 50000;
+      display: flex; align-items: center; justify-content: center;
+      overflow-y: auto; padding: 40px;
+    }
+    .unredact-doc {
+      max-width: 700px; width: 100%; background: #111;
+      border: 1px solid #333; padding: 30px; font-size: 13px; line-height: 1.8;
+    }
+    .unredact-header { text-align: center; margin-bottom: 25px; }
+    .unredact-classification { color: #f00; font-size: 10px; letter-spacing: 4px; margin-bottom: 10px; }
+    .unredact-title { color: #ff2d95; font-size: 18px; letter-spacing: 3px; }
+    .unredact-body { color: #ccc; }
+    .unredact-paragraph { margin-bottom: 12px; }
+    .unredact-footer { margin-top: 25px; text-align: center; }
+    .unredact-hint { color: #555; font-size: 11px; display: block; margin-bottom: 15px; }
+    .fake-context-menu { font-family: 'Courier New', monospace; }
+    .ctx-danger { color: #f00 !important; }
+    .victory-stats {
+      position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      z-index: 10003; text-align: center; font-family: monospace;
+      background: rgba(0,0,0,0.9); padding: 30px 50px; border: 1px solid #0f0;
+    }
+    .stat-line { color: #0f0; font-size: 14px; margin: 6px 0; letter-spacing: 1px; }
+    .aura-line { color: #ffd700; font-size: 20px; margin-top: 15px; text-shadow: 0 0 10px #ffd700; }
+    .kirk-saved-overlay .kirk-saved-text { color: #ffd700; font-size: 36px; margin-bottom: 10px; letter-spacing: 3px; }
+    .kirk-saved-overlay .kirk-saved-sub { color: #0f0; font-size: 14px; margin-bottom: 5px; }
+  </style>
+</head>
+<body>
+
+  <!-- ===== EPILEPSY WARNING ===== -->
+  <div id="epilepsy-warning">
+    <h1>WARNING</h1>
+    <p>This game contains flashing lights, screen shake, rapidly moving elements, color strobing, fake error messages, intentionally bad UI, and general visual chaos.</p>
+    <p>It may also contain: conspiracy theories, shitposting, 4chan energy, a hostage situation involving Charlie Kirk, crab people, ancient aliens, and genuinely unhinged dialogue.</p>
+    <p style="color:#f00;font-size:14px">If you are sensitive to flashing/strobing effects, this game is not for you.</p>
+    <p class="subtitle">SHITCODE: OPERATION CLICKPILLED v6.6.6</p>
+    <p class="subtitle">"The Button Goes Deeper Than You Know"</p>
+    <button id="warning-accept">I ACCEPT THE RISKS (genuinely)</button>
+    <p class="subtitle" style="margin-top:10px;color:#333">there is no going back</p>
+  </div>
+
+  <!-- ===== TERMINAL PHASE (Phase 0: Broken IDE) ===== -->
+  <div id="terminal-phase">
+    <div class="terminal-container">
+      <div class="terminal-topbar">
+        <div class="dots">
+          <div class="dot r" title="close (it won't)"></div>
+          <div class="dot y" title="minimize (impossible)"></div>
+          <div class="dot g" title="maximize (already is)"></div>
+        </div>
+        <div class="title">shitcode.exe - Definitely Not Malware IDE</div>
+        <div class="clock" id="terminal-clock">00:00:00</div>
+      </div>
+      <div class="terminal-body">
+        <div class="terminal-sidebar" id="terminal-sidebar"></div>
+        <div class="terminal-main">
+          <div class="terminal-editor" id="terminal-editor"></div>
+          <button id="terminal-start-btn">START</button>
+          <div class="terminal-input-area">
+            <span>&gt;</span>
+            <input type="text" id="terminal-input" placeholder="type something (it won't help)" autocomplete="off" spellcheck="false">
+          </div>
+          <div class="terminal-status">
+            <span>UTF-8</span>
+            <span>LF</span>
+            <span>JavaScript</span>
+            <span>Spaces: 4 (lying)</span>
+            <span class="error-count" id="error-count">0 errors</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TRANSITION SCREEN ===== -->
+  <div id="transition-screen">
+    <div class="glitch-text">LOADING...</div>
+    <div class="sub-text"></div>
+    <div class="sub-text2"></div>
+  </div>
+
+  <!-- ===== GAME PHASE ===== -->
+  <div id="game-phase">
+    <div class="game-container">
+      <!-- Top bar -->
+      <div class="game-topbar">
+        <div class="kirk-meter">
+          <div class="kirk-meter-label">KIRK SURVIVAL STATUS</div>
+          <div class="kirk-meter-bar">
+            <div class="kirk-meter-fill" id="kirk-meter-fill"></div>
+          </div>
+          <div class="kirk-status" id="kirk-status">GENUINELY FINE</div>
+        </div>
+        <div class="level-info">
+          <div class="level-num" id="level-num">LEVEL 1</div>
+          <div class="level-name" id="level-name">---</div>
+        </div>
+        <div class="attempt-counter" id="attempt-counter">Attempts: 0</div>
+        <div class="timer-display" id="timer-display"></div>
+      </div>
+
+      <!-- Main game area + thread panel -->
+      <div class="game-main">
+        <div class="game-arena" id="game-arena"></div>
+        <div class="thread-panel" id="thread-panel-wrap">
+          <div class="thread-header">
+            <span>/shit/ - SHITCODE GENERAL</span>
+            <span class="thread-board" id="thread-board">/v/</span>
+          </div>
+          <div id="thread-panel"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Jerry panel -->
+    <div class="jerry-panel" id="jerry-panel">
+      <div class="jerry-header">
+        <div class="jerry-avatar">J</div>
+        <span>Jerry [Handler] - SECURE CHANNEL</span>
+        <span class="jerry-status">ENCRYPTION: ACTIVE (the cat, not the protocol)</span>
+      </div>
+      <div class="jerry-text" id="jerry-text"></div>
+    </div>
+
+    <!-- Kirk text popup -->
+    <div class="kirk-text" id="kirk-text">
+      <div class="kirk-name">
+        <div class="kirk-icon">K</div>
+        Kirk [Hostage] - ENCRYPTED
+      </div>
+      <div class="kirk-msg" id="kirk-msg"></div>
+    </div>
+
+    <!-- SC box -->
+    <div class="sc-box" id="sc-box">
+      <div class="sc-title">SCHR&Ouml;DINGER'S BOX</div>
+      <div class="sc-cat">&#x1F431;</div>
+      <div class="sc-text" id="sc-text">A box. Help or suffering.</div>
+      <div>
+        <button id="sc-open">OPEN</button>
+        <button id="sc-ignore">IGNORE</button>
+      </div>
+    </div>
+
+    <!-- Achievement popup -->
+    <div class="achievement" id="achievement">
+      <div class="ach-title"></div>
+      <div class="ach-desc"></div>
+    </div>
+
+    <!-- CSD meter -->
+    <div class="csd-meter" id="csd-meter">
+      <div class="csd-item cope inactive">COPE</div>
+      <div class="csd-item seethe inactive">SEETHE</div>
+      <div class="csd-item dilate inactive">DILATE</div>
+    </div>
+
+    <!-- GBP display -->
+    <div class="gbp-display" id="gbp-display">GBP: 0</div>
+  </div>
+
+  <!-- ===== VICTORY PHASE ===== -->
+  <div id="victory-phase"></div>
+
+  <!-- ===== CRT flicker overlay ===== -->
+  <div id="crt-flicker"></div>
+
+  <!-- ===== SCRIPTS ===== -->
+  <script src="js/engine.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/characters.js"></script>
+  <script src="js/thread.js"></script>
+  <script src="js/meta.js"></script>
+  <script src="js/levels.js"></script>
+  <script src="js/victory.js"></script>
+  <script src="js/terminal.js"></script>
+
+  <script>
+    // === INIT ===
+    document.getElementById('warning-accept').addEventListener('click', function() {
+      document.getElementById('epilepsy-warning').style.display = 'none';
+      document.getElementById('terminal-phase').style.display = 'block';
+      GAME.phase = 'terminal';
+      if (window.AUDIO) AUDIO.init();
+      if (window.AUDIO) AUDIO.play('dialup');
+      window.initTerminal();
+      if (window.initMeta) window.initMeta();
+    });
+
+    // Terminal dot jokes
+    document.querySelector('.dot.r').addEventListener('click', function() {
+      if (GAME.phase === 'terminal' && window.JERRY) {
+        JERRY.speak('random', "You tried to CLOSE the window? GENUINELY? This is MISSION SOFTWARE. It closes when KIRK is saved.");
+      }
+    });
+    document.querySelector('.dot.y').addEventListener('click', function() {
+      document.body.style.transform = 'scale(0.5)';
+      setTimeout(function() { document.body.style.transform = ''; }, 1000);
+    });
+    document.querySelector('.dot.g').addEventListener('click', function() {
+      document.body.style.transform = 'rotate(2deg)';
+      setTimeout(function() { document.body.style.transform = ''; }, 800);
+    });
+
+    // Game timer
+    setInterval(function() {
+      if (GAME.phase !== 'game') return;
+      var el = document.getElementById('timer-display');
+      if (!el) return;
+      var elapsed = Math.floor((Date.now() - GAME.startTime) / 1000);
+      var m = Math.floor(elapsed / 60);
+      var s = elapsed % 60;
+      el.textContent = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+      if (Math.random() < 0.03) {
+        el.textContent = (m + rand(1,99)) + ':' + rand(0,99);
+        setTimeout(function() {
+          var e2 = Math.floor((Date.now() - GAME.startTime) / 1000);
+          el.textContent = (Math.floor(e2/60) < 10 ? '0' : '') + Math.floor(e2/60) + ':' + (e2%60 < 10 ? '0' : '') + (e2%60);
+        }, 500);
+      }
+    }, 1000);
+
+    // Thread board label per dimension
+    setInterval(function() {
+      if (GAME.phase !== 'game') return;
+      var boardEl = document.getElementById('thread-board');
+      if (boardEl && GAME.boards[GAME.dimension]) boardEl.textContent = GAME.boards[GAME.dimension];
+      if (window.THREAD && Math.random() < 0.08) THREAD.postDimensionFlavor();
+    }, 12000);
+
+    // Dimension class on arena
+    setInterval(function() {
+      if (GAME.phase !== 'game') return;
+      var arena = document.getElementById('game-arena');
+      if (!arena) return;
+      for (var i = 1; i <= 7; i++) arena.classList.remove('dim-' + i);
+      arena.classList.add('dim-' + GAME.dimension);
+    }, 2000);
+
+    // CRT flicker
+    setInterval(function() {
+      var flicker = document.getElementById('crt-flicker');
+      if (!flicker) return;
+      if (Math.random() < 0.03) {
+        flicker.style.background = 'rgba(255,255,255,0.02)';
+        flicker.style.opacity = '1';
+        setTimeout(function() { flicker.style.opacity = '0'; }, 50);
+      }
+    }, 200);
+
+    // Konami code
+    (function() {
+      var pattern = [38,38,40,40,37,39,37,39,66,65], idx = 0;
+      document.addEventListener('keydown', function(e) {
+        if (e.keyCode === pattern[idx]) {
+          idx++;
+          if (idx === pattern.length) {
+            idx = 0;
+            if (window.unlockAchievement) unlockAchievement('konami', 'UP UP DOWN DOWN', 'The code still works. Genuinely.');
+            if (window.JERRY) JERRY.speak('random', "THE KONAMI CODE? In MY secure terminal? GENUINELY based. +50 GBP.");
+            if (window.addGBP) addGBP(50);
+            if (window.AUDIO) AUDIO.play('achievement');
+          }
+        } else { idx = 0; }
+      });
+    })();
+
+    // Prevent page close during game
+    window.addEventListener('beforeunload', function(e) {
+      if (GAME.phase === 'game') {
+        e.preventDefault();
+        e.returnValue = 'Kirk is still held hostage. Genuinely.';
+        return e.returnValue;
+      }
+    });
+  </script>
+</body>
+</html>
