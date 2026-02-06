@@ -62,16 +62,8 @@
 </head>
 <body>
 
-  <!-- ===== AUDIO UNLOCK SPLASH ===== -->
-  <div id="audio-unlock" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;">
-    <div style="color:#ff2d95;font-size:42px;letter-spacing:8px;margin-bottom:20px;text-shadow:0 0 20px #ff2d95;">SHITCODE</div>
-    <div style="color:#0f0;font-size:14px;letter-spacing:3px;margin-bottom:40px;">OPERATION CLICKPILLED</div>
-    <div style="color:#666;font-size:18px;animation:pulse 1.5s infinite;">[ CLICK ANYWHERE TO BEGIN ]</div>
-    <div style="color:#333;font-size:11px;margin-top:30px;">🔊 audio will engage</div>
-  </div>
-
   <!-- ===== EPILEPSY WARNING ===== -->
-  <div id="epilepsy-warning" style="display:none;">
+  <div id="epilepsy-warning">
     <h1>WARNING</h1>
     <p>This game contains flashing lights, screen shake, rapidly moving elements, color strobing, fake error messages, intentionally bad UI, and general visual chaos.</p>
     <p>It may also contain: conspiracy theories, shitposting, 4chan energy, a hostage situation involving Charlie Kirk, crab people, ancient aliens, and genuinely unhinged dialogue.</p>
@@ -219,26 +211,19 @@
   <script src="js/terminal.js"></script>
 
   <script>
-    // === AUDIO UNLOCK SPLASH ===
-    document.getElementById('audio-unlock').addEventListener('click', function() {
-      // Hide splash, show warning
-      document.getElementById('audio-unlock').style.display = 'none';
-      document.getElementById('epilepsy-warning').style.display = 'flex';
-
-      // Initialize and start music immediately
-      if (window.AUDIO) {
-        AUDIO.init();
-        AUDIO.startBGMusic();
-      }
-    });
-
     // === INIT ===
     document.getElementById('warning-accept').addEventListener('click', function() {
       document.getElementById('epilepsy-warning').style.display = 'none';
       document.getElementById('terminal-phase').style.display = 'block';
       GAME.phase = 'terminal';
-      if (window.AUDIO) AUDIO.init();
-      if (window.AUDIO) AUDIO.play('dialup');
+
+      // Initialize audio and start O Fortuna immediately
+      if (window.AUDIO) {
+        AUDIO.init();
+        AUDIO.startBGMusic(); // O FORTUNA BEGINS
+        AUDIO.play('dialup');
+      }
+
       window.initTerminal();
       if (window.initMeta) window.initMeta();
     });
