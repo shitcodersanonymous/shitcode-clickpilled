@@ -25,7 +25,7 @@ window.AUDIO = {
           }).catch(function(e) {
             console.log('Music play failed:', e);
           });
-        }, 2000);
+        }, 2500);
       });
 
       this.bgMusic.load();
