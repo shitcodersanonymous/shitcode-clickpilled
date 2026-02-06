@@ -18,14 +18,12 @@ window.AUDIO = {
       this.bgMusic.volume = 0.5;
 
       this.bgMusic.addEventListener('canplay', function() {
-        setTimeout(function() {
-          self.bgMusic.play().then(function() {
-            self.bgMusicPlaying = true;
-            console.log('O FORTUNA ACTIVATED');
-          }).catch(function(e) {
-            console.log('Music play failed:', e);
-          });
-        }, 4000);
+        self.bgMusic.play().then(function() {
+          self.bgMusicPlaying = true;
+          console.log('O FORTUNA ACTIVATED');
+        }).catch(function(e) {
+          console.log('Music play failed:', e);
+        });
       });
 
       this.bgMusic.load();
