@@ -9,16 +9,24 @@ window.AUDIO = {
   },
 
   // Background music - O Fortuna (Carmina Burana)
-  startBGMusic() {
+  // Call with delay param to start muted then fade in
+  startBGMusic(delay) {
     if (this.bgMusicPlaying) return;
-    this.bgMusicPlaying = true; // Set immediately to prevent double calls
+    this.bgMusicPlaying = true;
     var self = this;
     try {
       this.bgMusic = new Audio('audio/o-fortuna.mp3');
       this.bgMusic.loop = true;
-      this.bgMusic.volume = 0.5;
+      this.bgMusic.volume = delay ? 0 : 0.5; // Start muted if delay
       this.bgMusic.play().then(function() {
-        console.log('O FORTUNA ACTIVATED');
+        if (delay) {
+          setTimeout(function() {
+            self.bgMusic.volume = 0.5;
+            console.log('O FORTUNA ACTIVATED');
+          }, delay);
+        } else {
+          console.log('O FORTUNA ACTIVATED');
+        }
       }).catch(function(e) {
         console.log('Music play failed:', e);
         self.bgMusicPlaying = false;

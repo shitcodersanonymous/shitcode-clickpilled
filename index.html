@@ -217,14 +217,11 @@
       document.getElementById('terminal-phase').style.display = 'block';
       GAME.phase = 'terminal';
 
-      // Initialize audio - dialup first, then O Fortuna after delay
+      // Initialize audio - dialup first, then O Fortuna fades in after 4s
       if (window.AUDIO) {
         AUDIO.init();
         AUDIO.play('dialup');
-        // Wait for dialup to finish before starting O Fortuna
-        setTimeout(function() {
-          AUDIO.startBGMusic();
-        }, 4000);
+        AUDIO.startBGMusic(4000); // Start muted, unmute after 4s
       }
 
       window.initTerminal();
