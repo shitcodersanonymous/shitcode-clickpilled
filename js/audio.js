@@ -1,8 +1,51 @@
-// SHITCODE - Audio System (Web Audio API oscillators)
+// SHITCODE - Audio System (Web Audio API oscillators + background music)
 window.AUDIO = {
   ctx: null,
+  bgMusic: null,
+  bgMusicPlaying: false,
+
   init() {
     try { this.ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+  },
+
+  // Background music - O Fortuna (Carmina Burana) - UC Davis University Chorus
+  startBGMusic() {
+    if (this.bgMusicPlaying) return;
+    try {
+      this.bgMusic = new Audio('https://www.orangefreesounds.com/wp-content/uploads/2016/11/Carl-orff-carmina-burana.mp3');
+      this.bgMusic.loop = true;
+      this.bgMusic.volume = 0.3;
+      this.bgMusic.play().then(() => {
+        this.bgMusicPlaying = true;
+        console.log('O FORTUNA ACTIVATED - genuinely epic. Kirk awaits.');
+      }).catch(e => {
+        console.log('Music autoplay blocked - will play after next interaction');
+        // Retry on next user interaction
+        const retryMusic = () => {
+          this.bgMusic.play().then(() => {
+            this.bgMusicPlaying = true;
+            document.removeEventListener('click', retryMusic);
+            document.removeEventListener('touchstart', retryMusic);
+          }).catch(() => {});
+        };
+        document.addEventListener('click', retryMusic, { once: true });
+        document.addEventListener('touchstart', retryMusic, { once: true });
+      });
+    } catch(e) {
+      console.log('Music error:', e);
+    }
+  },
+
+  stopBGMusic() {
+    if (this.bgMusic) {
+      this.bgMusic.pause();
+      this.bgMusic.currentTime = 0;
+      this.bgMusicPlaying = false;
+    }
+  },
+
+  setBGMusicVolume(vol) {
+    if (this.bgMusic) this.bgMusic.volume = clamp(vol, 0, 1);
   },
   _osc(freq, type, dur, vol) {
     if (!this.ctx) return;

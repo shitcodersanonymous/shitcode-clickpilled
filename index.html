@@ -218,6 +218,8 @@
       GAME.phase = 'terminal';
       if (window.AUDIO) AUDIO.init();
       if (window.AUDIO) AUDIO.play('dialup');
+      // Start O Fortuna - genuinely epic
+      if (window.AUDIO) AUDIO.startBGMusic();
       window.initTerminal();
       if (window.initMeta) window.initMeta();
     });
