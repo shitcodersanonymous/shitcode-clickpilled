@@ -178,6 +178,32 @@ function loadGame(){
 }
 setInterval(()=>{if(GAME.phase==='game'&&Math.random()<.4)saveGame();},30000);
 
+// Mobile detection & touch helpers
+const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || ('ontouchstart' in window);
+
+// Unified pointer events - works on both mouse and touch
+function addPointerMove(el, fn) {
+  el.addEventListener('mousemove', fn);
+  el.addEventListener('touchmove', e => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    fn({ clientX: touch.clientX, clientY: touch.clientY, touches: e.touches });
+  }, { passive: false });
+}
+
+function addPointerDown(el, fn) {
+  el.addEventListener('mousedown', fn);
+  el.addEventListener('touchstart', e => {
+    const touch = e.touches[0];
+    fn({ clientX: touch.clientX, clientY: touch.clientY, touches: e.touches });
+  }, { passive: true });
+}
+
+function addPointerUp(el, fn) {
+  el.addEventListener('mouseup', fn);
+  el.addEventListener('touchend', fn, { passive: true });
+}
+
 // expose globals
 window.$=$;window.$$=$$;window.rand=rand;window.pick=pick;window.sleep=sleep;window.clamp=clamp;
 window.clearGameIntervals=clearGameIntervals;window.addInterval=addInterval;window.addTimeout=addTimeout;
@@ -185,3 +211,4 @@ window.shakeScreen=shakeScreen;window.spawnL=spawnL;window.flashScreen=flashScre
 window.addGBP=addGBP;window.updateCSD=updateCSD;window.unlockAchievement=unlockAchievement;
 window.updateKirkMeter=updateKirkMeter;window.levelFail=levelFail;window.levelComplete=levelComplete;
 window.startLevel=startLevel;window.showSC=showSC;window.saveGame=saveGame;window.loadGame=loadGame;
+window.isMobile=isMobile;window.addPointerMove=addPointerMove;window.addPointerDown=addPointerDown;window.addPointerUp=addPointerUp;

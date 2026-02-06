@@ -14,21 +14,23 @@ window.ALL_LEVELS = [
     btn.className = 'start-btn'; btn.textContent = 'START';
     btn.style.cssText = 'left:50%;top:50%;transform:translate(-50%,-50%)';
     arena.appendChild(btn);
-    let speed = 3;
+    let speed = isMobile ? 2 : 3;
+    let evadeRadius = isMobile ? 100 : 150;
     const evade = e => {
       const r = btn.getBoundingClientRect(), ar = arena.getBoundingClientRect();
       const bx=r.left+r.width/2, by=r.top+r.height/2;
       const dx=e.clientX-bx, dy=e.clientY-by, dist=Math.sqrt(dx*dx+dy*dy);
-      if(dist<150){
+      if(dist<evadeRadius){
         let nx=bx-dx*speed, ny=by-dy*speed;
         nx=clamp(nx,ar.left+50,ar.right-50); ny=clamp(ny,ar.top+50,ar.bottom-50);
         btn.style.left=(nx-ar.left)+'px'; btn.style.top=(ny-ar.top)+'px'; btn.style.transform='none';
-        speed=Math.min(speed+0.1,10);
+        speed=Math.min(speed+0.1, isMobile ? 6 : 10);
       }
     };
-    arena.addEventListener('mousemove',evade);
-    btn.addEventListener('click',()=>{arena.removeEventListener('mousemove',evade);levelComplete();});
-    addInterval(()=>{speed=Math.min(speed+0.2,12);},3000);
+    addPointerMove(arena, evade);
+    btn.addEventListener('click',()=>levelComplete());
+    btn.addEventListener('touchend',e=>{e.preventDefault();levelComplete();});
+    addInterval(()=>{speed=Math.min(speed+0.2, isMobile ? 8 : 12);},3000);
     THREAD.post(THREAD.greentext(['be me','trying to click START','button runs away','like everything else in my life']));
   }
 },
@@ -158,15 +160,26 @@ window.ALL_LEVELS = [
   init(arena) {
     const btn=document.createElement('button');btn.className='start-btn ghost';btn.textContent='START';
     let bx=rand(10,90),by=rand(10,90);
-    btn.style.cssText=`position:absolute;left:${bx}%;top:${by}%;opacity:0.03;transition:opacity 0.3s`;
-    arena.appendChild(btn); btn.addEventListener('click',levelComplete);
-    arena.addEventListener('mousemove',e=>{
+    // On mobile, start more visible since touch is harder
+    const baseOpacity = isMobile ? 0.15 : 0.03;
+    btn.style.cssText=`position:absolute;left:${bx}%;top:${by}%;opacity:${baseOpacity};transition:opacity 0.3s`;
+    arena.appendChild(btn);
+    btn.addEventListener('click',levelComplete);
+    btn.addEventListener('touchend',e=>{e.preventDefault();levelComplete();});
+    const ghostMove = e => {
       const r=btn.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
       const dist=Math.sqrt((e.clientX-cx)**2+(e.clientY-cy)**2);
-      if(dist<200){btn.style.opacity=Math.max(0.02,(dist-50)/400);
-        if(dist<80){bx=rand(10,90);by=rand(10,90);btn.style.left=bx+'%';btn.style.top=by+'%';}
-      }else{btn.style.opacity=Math.min(0.6,0.1+(dist-200)/500);}
-    });
+      const nearDist = isMobile ? 120 : 200;
+      const teleportDist = isMobile ? 50 : 80;
+      if(dist<nearDist){btn.style.opacity=Math.max(baseOpacity,(dist-50)/400);
+        if(dist<teleportDist){bx=rand(10,90);by=rand(10,90);btn.style.left=bx+'%';btn.style.top=by+'%';}
+      }else{btn.style.opacity=Math.min(0.6,0.1+(dist-nearDist)/500);}
+    };
+    addPointerMove(arena, ghostMove);
+    // On mobile, periodically flash button location
+    if(isMobile){
+      addInterval(()=>{btn.style.opacity='0.5';addTimeout(()=>{btn.style.opacity=baseOpacity;},300);},4000);
+    }
     THREAD.post(THREAD.greentext(['button invisible','look at it = disappears','like my dating life']));
   }
 },
@@ -180,15 +193,21 @@ window.ALL_LEVELS = [
     c.appendChild(sl);
     const val=document.createElement('div');val.className='slider-value';val.textContent='0%';c.appendChild(val);
     let holding=false;
-    sl.addEventListener('mousedown',()=>holding=true);
-    sl.addEventListener('mouseup',()=>{holding=false;addTimeout(()=>{if(!holding){sl.value=Math.max(0,sl.value-30);val.textContent=Math.max(0,parseInt(sl.value))+'%';}},100);});
+    const startHold=()=>holding=true;
+    const endHold=()=>{holding=false;addTimeout(()=>{if(!holding){sl.value=Math.max(0,sl.value-30);val.textContent=Math.max(0,parseInt(sl.value))+'%';}},100);};
+    sl.addEventListener('mousedown',startHold);
+    sl.addEventListener('mouseup',endHold);
+    sl.addEventListener('touchstart',startHold,{passive:true});
+    sl.addEventListener('touchend',endHold,{passive:true});
     sl.addEventListener('input',()=>{val.textContent=Math.max(0,parseInt(sl.value))+'%';
       if(parseInt(sl.value)>=100){c.innerHTML='';const btn=document.createElement('button');btn.className='start-btn';btn.textContent='START';
-        btn.style.cssText='position:relative;display:block;margin:20px auto';c.appendChild(btn);btn.addEventListener('click',levelComplete);}
+        btn.style.cssText='position:relative;display:block;margin:20px auto';c.appendChild(btn);
+        btn.addEventListener('click',levelComplete);btn.addEventListener('touchend',e=>{e.preventDefault();levelComplete();});}
     });
-    addInterval(()=>{if(holding&&parseInt(sl.value)>0){sl.value=parseInt(sl.value)-rand(1,5);val.textContent=Math.max(0,parseInt(sl.value))+'%';}},200);
-    addInterval(()=>{if(Math.random()<0.3&&parseInt(sl.value)>50){sl.value=parseInt(sl.value)-20;val.textContent=Math.max(0,parseInt(sl.value))+'%';shakeScreen('normal');
-      THREAD.post('THE SLIDER JUST YEETED 20%');}},2000);
+    const fightBack = isMobile ? rand(1,3) : rand(1,5);
+    addInterval(()=>{if(holding&&parseInt(sl.value)>0){sl.value=parseInt(sl.value)-fightBack;val.textContent=Math.max(0,parseInt(sl.value))+'%';}},200);
+    addInterval(()=>{if(Math.random()<0.3&&parseInt(sl.value)>50){sl.value=parseInt(sl.value)-(isMobile?10:20);val.textContent=Math.max(0,parseInt(sl.value))+'%';shakeScreen('normal');
+      THREAD.post('THE SLIDER JUST YEETED '+(isMobile?'10':'20')+'%');}},2000);
     arena.appendChild(c);
     THREAD.post('slider mechanic. 39k upvotes on reddit. genuinely the worst UI ever made.');
   }
@@ -293,15 +312,17 @@ window.ALL_LEVELS = [
         fakes.forEach(f=>f.remove());fakes.length=0;
       });
       // Evasion
-      arena.addEventListener('mousemove',e=>{
+      const bossEvade=e=>{
         const r=btn.getBoundingClientRect(),ar=arena.getBoundingClientRect();
         const cx=r.left+r.width/2,cy=r.top+r.height/2,dx=e.clientX-cx,dy=e.clientY-cy;
-        if(Math.sqrt(dx*dx+dy*dy)<120){
+        const evadeR=isMobile?80:120;
+        if(Math.sqrt(dx*dx+dy*dy)<evadeR){
           let nx=cx-dx*2,ny=cy-dy*2;
           nx=clamp(nx,ar.left+30,ar.right-30);ny=clamp(ny,ar.top+30,ar.bottom-30);
           btn.style.left=(nx-ar.left)+'px';btn.style.top=(ny-ar.top)+'px';btn.style.transform='none';
         }
-      });
+      };
+      addPointerMove(arena,bossEvade);
       // Boss taunts floating
       const taunts=BOSS_AI.tpusa.taunts;
       addInterval(()=>{
@@ -570,14 +591,16 @@ window.ALL_LEVELS = [
         btn.style.left=rand(10,90)+'%';btn.style.top=rand(10,90)+'%';
         fakes.forEach(f=>f.remove());fakes.length=0;
       });
-      arena.addEventListener('mousemove',e=>{
+      const adminEvade=e=>{
         const r=btn.getBoundingClientRect(),ar=arena.getBoundingClientRect();
         const dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2);
-        if(Math.sqrt(dx*dx+dy*dy)<100){
+        const evadeR=isMobile?70:100;
+        if(Math.sqrt(dx*dx+dy*dy)<evadeR){
           btn.style.left=clamp((r.left+r.width/2-dx*2)-ar.left,30,ar.width-30)+'px';
           btn.style.top=clamp((r.top+r.height/2-dy*2)-ar.top,30,ar.height-30)+'px';btn.style.transform='none';
         }
-      });
+      };
+      addPointerMove(arena,adminEvade);
       const taunts=["Your clicking has been flagged by HR","This will be reflected in your annual review",
         "Your colleagues click 847% faster","We're going to have to let you go. And by 'let you go' I mean 'eliminate you'",
         "Please sign this termination form. The Sign button will try to escape."];
@@ -618,11 +641,15 @@ window.ALL_LEVELS = [
     tapArea.style.cssText='width:200px;height:200px;margin:15px auto;border:3px solid #0f0;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:#0f0;transition:.1s;user-select:none';
     tapArea.textContent='TAP HERE';
     let downTime=0;
-    tapArea.addEventListener('mousedown',()=>{downTime=Date.now();tapArea.style.background='rgba(0,255,0,0.2)';tapArea.style.transform='scale(0.95)';});
-    tapArea.addEventListener('mouseup',()=>{
+    const tapDown=()=>{downTime=Date.now();tapArea.style.background='rgba(0,255,0,0.2)';tapArea.style.transform='scale(0.95)';};
+    const tapUp=()=>{
       const dur=Date.now()-downTime;tapArea.style.background='';tapArea.style.transform='';
       const symbol=dur>=300?'-':'.';currentMorse+=symbol;morseDisplay.textContent=currentMorse;
-    });
+    };
+    tapArea.addEventListener('mousedown',tapDown);
+    tapArea.addEventListener('mouseup',tapUp);
+    tapArea.addEventListener('touchstart',tapDown,{passive:true});
+    tapArea.addEventListener('touchend',e=>{e.preventDefault();tapUp();});
     // Space = submit character (button)
     const submitChar=document.createElement('button');submitChar.style.cssText='display:block;margin:10px auto;padding:8px 25px;background:none;border:1px solid #0f0;color:#0f0;font-family:inherit;cursor:pointer';
     submitChar.textContent='SUBMIT LETTER';
@@ -664,8 +691,9 @@ window.ALL_LEVELS = [
         btn.style.left=(nx-ar.left)+'px';btn.style.top=(ny-ar.top)+'px';btn.style.transform='scaleX(-1)';
         speed=Math.min(speed+0.05,8);}
     };
-    arena.addEventListener('mousemove',evade);
-    btn.addEventListener('click',()=>{arena.removeEventListener('mousemove',evade);arena.style.transform='';levelComplete();});
+    addPointerMove(arena,evade);
+    btn.addEventListener('click',()=>{arena.style.transform='';levelComplete();});
+    btn.addEventListener('touchend',e=>{e.preventDefault();arena.style.transform='';levelComplete();});
     THREAD.post(THREAD.greentext(['mirror world','mouse moves opposite','brain hurts','the crabs think this is funny']));
   }
 },
@@ -705,21 +733,15 @@ window.ALL_LEVELS = [
     const elements=['Settings','Help','About','Theme','Zoom','Console','Debug','Profile','Export'];
     elements.forEach((name,i)=>{
       const el=document.createElement('div');
-      el.style.cssText=`position:absolute;left:${10+rand(0,70)}%;top:${15+rand(0,50)}%;padding:8px 15px;background:#1a1a2e;border:1px solid #333;color:#888;cursor:grab;font-size:12px;z-index:10;user-select:none`;
+      el.style.cssText=`position:absolute;left:${10+rand(0,70)}%;top:${15+rand(0,50)}%;padding:8px 15px;background:#1a1a2e;border:1px solid #333;color:#888;cursor:grab;font-size:12px;z-index:10;user-select:none;touch-action:none`;
       el.textContent=name;el.draggable=false;
       let dragging=false,ox,oy;
-      el.addEventListener('mousedown',e=>{dragging=true;ox=e.offsetX;oy=e.offsetY;el.style.cursor='grabbing';el.style.zIndex='100';});
-      document.addEventListener('mousemove',e=>{
-        if(!dragging)return;
-        const ar=arena.getBoundingClientRect();
-        el.style.left=(e.clientX-ar.left-ox)+'px';el.style.top=(e.clientY-ar.top-oy)+'px';
-      });
-      document.addEventListener('mouseup',()=>{
+      const startDrag=(cx,cy)=>{dragging=true;const r=el.getBoundingClientRect();ox=cx-r.left;oy=cy-r.top;el.style.cursor='grabbing';el.style.zIndex='100';};
+      const moveDrag=(cx,cy)=>{if(!dragging)return;const ar=arena.getBoundingClientRect();el.style.left=(cx-ar.left-ox)+'px';el.style.top=(cy-ar.top-oy)+'px';};
+      const endDrag=()=>{
         if(!dragging)return;dragging=false;el.style.cursor='grab';el.style.zIndex='10';
-        // Check if over altar
         const elR=el.getBoundingClientRect(),altR=altar.getBoundingClientRect();
         if(elR.left<altR.right&&elR.right>altR.left&&elR.top<altR.bottom&&elR.bottom>altR.top){
-          // SACRIFICED
           el.textContent=pick(['AAAA!','NO!','WHY?!','*screams*','HELP!']);el.style.color='#f00';
           el.style.animation='fadeOut 0.5s forwards';
           setTimeout(()=>el.remove(),500);
@@ -731,11 +753,17 @@ window.ALL_LEVELS = [
             const btn=document.createElement('button');btn.className='start-btn';btn.textContent='START';
             btn.style.cssText='position:absolute;left:50%;top:40%;transform:translate(-50%,-50%)';
             btn.style.animation='fadeIn 1s';arena.appendChild(btn);
-            btn.addEventListener('click',levelComplete);
+            btn.addEventListener('click',levelComplete);btn.addEventListener('touchend',e=>{e.preventDefault();levelComplete();});
             altar.textContent='THE CRABS ARE PLEASED';altar.style.borderColor='#0f0';altar.style.color='#0f0';
           }
         }
-      });
+      };
+      el.addEventListener('mousedown',e=>{startDrag(e.clientX,e.clientY);});
+      document.addEventListener('mousemove',e=>{moveDrag(e.clientX,e.clientY);});
+      document.addEventListener('mouseup',endDrag);
+      el.addEventListener('touchstart',e=>{const t=e.touches[0];startDrag(t.clientX,t.clientY);},{passive:true});
+      document.addEventListener('touchmove',e=>{if(!dragging)return;e.preventDefault();const t=e.touches[0];moveDrag(t.clientX,t.clientY);},{passive:false});
+      document.addEventListener('touchend',endDrag,{passive:true});
       arena.appendChild(el);
     });
     THREAD.post(THREAD.greentext(['drag UI elements to altar','they scream','sacrifice enough to summon button','the crabs demand it']));
@@ -777,14 +805,16 @@ window.ALL_LEVELS = [
         setTimeout(()=>crab.remove(),10000);
       },1500);
       // Evasion
-      arena.addEventListener('mousemove',e=>{
+      const crabEvade=e=>{
         const r=btn.getBoundingClientRect(),ar=arena.getBoundingClientRect();
         const dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2);
-        if(Math.sqrt(dx*dx+dy*dy)<130){
+        const evadeR=isMobile?90:130;
+        if(Math.sqrt(dx*dx+dy*dy)<evadeR){
           btn.style.left=clamp((r.left+r.width/2-dx*2.5)-ar.left,30,ar.width-30)+'px';
           btn.style.top=clamp((r.top+r.height/2-dy*2.5)-ar.top,30,ar.height-30)+'px';btn.style.transform='none';
         }
-      });
+      };
+      addPointerMove(arena,crabEvade);
       // Crab taunts
       addInterval(()=>{
         THREAD.post(pick(BOSS_AI.crab.taunts),{name:'CRAB.COLLECTIVE',ai:true});
@@ -931,13 +961,15 @@ window.ALL_LEVELS = [
         btn.style.left=rand(10,90)+'%';btn.style.top=rand(10,90)+'%';
         THREAD.post(`LOLITA.SYS HIT ${hits}/3. "interesting. most stop after the first."`,{ai:true});
       });
-      arena.addEventListener('mousemove',e=>{
+      const lolitaEvade=e=>{
         const r=btn.getBoundingClientRect(),ar=arena.getBoundingClientRect();
         const dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2);
-        if(Math.sqrt(dx*dx+dy*dy)<140){
+        const evadeR=isMobile?100:140;
+        if(Math.sqrt(dx*dx+dy*dy)<evadeR){
           btn.style.left=clamp((r.left+r.width/2-dx*3)-ar.left,30,ar.width-30)+'px';
           btn.style.top=clamp((r.top+r.height/2-dy*3)-ar.top,30,ar.height-30)+'px';btn.style.transform='none';}
-      });
+      };
+      addPointerMove(arena,lolitaEvade);
       const taunts=["i know what you searched in 2019","want to see the footage? ...no?",
         "everyone who visits becomes... cooperative","i have footage of everyone. including you.",
         "the client list is long. your name might be on it. might not. wouldn't you like to know."];
@@ -1045,12 +1077,14 @@ window.ALL_LEVELS = [
         THREAD.post(pick(BOSS_AI.anunnaki.taunts),{name:'ANU.PRIME',ai:true});
       });
       // Extreme evasion
-      arena.addEventListener('mousemove',e=>{
+      const anuEvade=e=>{
         const r=btn.getBoundingClientRect(),ar=arena.getBoundingClientRect();
         const dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2),dist=Math.sqrt(dx*dx+dy*dy);
-        if(dist<180){btn.style.left=clamp((r.left+r.width/2-dx*3.5)-ar.left,20,ar.width-20)+'px';
+        const evadeR=isMobile?120:180;
+        if(dist<evadeR){btn.style.left=clamp((r.left+r.width/2-dx*3.5)-ar.left,20,ar.width-20)+'px';
           btn.style.top=clamp((r.top+r.height/2-dy*3.5)-ar.top,20,ar.height-20)+'px';btn.style.transform='none';}
-      });
+      };
+      addPointerMove(arena,anuEvade);
       // Gold particles
       addInterval(()=>{
         const p=document.createElement('div');
@@ -1121,13 +1155,15 @@ window.ALL_LEVELS = [
         btn.style.color=`rgba(17,17,17,${opacity*10})`;btn.style.borderColor=`rgba(17,17,17,${opacity*10})`;
       });
       // Extreme evasion + corruption
-      arena.addEventListener('mousemove',e=>{
+      const voidEvade=e=>{
         const r=btn.getBoundingClientRect(),ar=arena.getBoundingClientRect();
         const dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2);
-        if(Math.sqrt(dx*dx+dy*dy)<200){
+        const evadeR=isMobile?130:200;
+        if(Math.sqrt(dx*dx+dy*dy)<evadeR){
           btn.style.left=clamp((r.left+r.width/2-dx*4)-ar.left,10,ar.width-10)+'px';
           btn.style.top=clamp((r.top+r.height/2-dy*4)-ar.top,10,ar.height-10)+'px';btn.style.transform='none';}
-      });
+      };
+      addPointerMove(arena,voidEvade);
       // Void taunts
       addInterval(()=>{
         const t=document.createElement('div');
@@ -1163,13 +1199,15 @@ window.ALL_LEVELS = [
       btn.style.left=rand(5,90)+'%';btn.style.top=rand(5,90)+'%';
     });
     // EVERYTHING at once
-    // 1. Evasion (extreme)
-    arena.addEventListener('mousemove',e=>{
+    // 1. Evasion (extreme) - easier on mobile
+    const finalEvade=e=>{
       const r=btn.getBoundingClientRect(),ar=arena.getBoundingClientRect();
       const dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2),dist=Math.sqrt(dx*dx+dy*dy);
-      if(dist<200){btn.style.left=clamp((r.left+r.width/2-dx*5)-ar.left,10,ar.width-10)+'px';
-        btn.style.top=clamp((r.top+r.height/2-dy*5)-ar.top,10,ar.height-10)+'px';btn.style.transform='none';}
-    });
+      const evadeR=isMobile?130:200;const evadeSpeed=isMobile?3:5;
+      if(dist<evadeR){btn.style.left=clamp((r.left+r.width/2-dx*evadeSpeed)-ar.left,10,ar.width-10)+'px';
+        btn.style.top=clamp((r.top+r.height/2-dy*evadeSpeed)-ar.top,10,ar.height-10)+'px';btn.style.transform='none';}
+    };
+    addPointerMove(arena,finalEvade);
     // 2. Fakes spawning
     addInterval(()=>{if(arena.querySelectorAll('.fake').length<20){
       const f=document.createElement('button');f.className='start-btn fake';f.textContent='START';

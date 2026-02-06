@@ -345,3 +345,187 @@ body::after{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backgr
 .mb-10{margin-bottom:10px}
 .arena-text{position:absolute;color:var(--green);font-size:16px;text-align:center;width:80%;left:10%;pointer-events:none}
 .arena-subtitle{color:var(--dim);font-size:12px;margin-top:5px}
+
+/* ===== MOBILE STYLES ===== */
+@media screen and (max-width: 768px) {
+  /* Base adjustments */
+  html,body{font-size:12px;overflow:hidden;position:fixed;width:100%;height:100%}
+
+  /* Epilepsy warning */
+  #epilepsy-warning{padding:20px}
+  #epilepsy-warning h1{font-size:28px;letter-spacing:2px}
+  #epilepsy-warning p{font-size:14px;max-width:90%}
+  #epilepsy-warning button{padding:12px 25px;font-size:14px}
+
+  /* Terminal phase */
+  .terminal-topbar{height:28px;padding:0 8px}
+  .terminal-topbar .title{font-size:10px;display:none}
+  .terminal-topbar .clock{font-size:10px}
+  .terminal-topbar .dots{gap:4px}
+  .terminal-topbar .dot{width:10px;height:10px}
+  .terminal-sidebar{display:none}
+  .terminal-main{width:100%}
+  .terminal-editor{padding:10px;font-size:11px;line-height:1.6}
+  .line-num{width:25px;margin-right:8px;font-size:10px}
+  .terminal-input-area{height:36px;padding:0 10px}
+  #terminal-input{font-size:12px}
+  .terminal-status{height:20px;font-size:9px;gap:8px;padding:0 8px}
+  #terminal-start-btn{bottom:60px;right:10px;padding:12px 24px;font-size:14px}
+  .system-msg,.other-user-typing{font-size:10px}
+
+  /* Transition screen */
+  #transition-screen .glitch-text{font-size:28px}
+  #transition-screen .sub-text{font-size:12px}
+
+  /* Game phase - main layout */
+  .game-topbar{height:auto;min-height:40px;padding:5px 10px;flex-wrap:wrap;gap:5px}
+  .kirk-meter{max-width:none;width:100%;order:1}
+  .kirk-meter-label{font-size:9px}
+  .kirk-meter-bar{height:8px}
+  .kirk-status{font-size:9px}
+  .level-info{margin-left:0;order:2;flex:1}
+  .level-info .level-num{font-size:14px}
+  .level-info .level-name{font-size:9px}
+  .level-info .dimension{font-size:8px}
+  .attempt-counter{margin-left:0;font-size:10px;order:3}
+  .timer-display{margin-left:auto;font-size:12px;order:4}
+
+  /* Game main - stack vertically, hide thread on mobile by default */
+  .game-main{flex-direction:column}
+  .game-arena{flex:1;min-height:50vh}
+
+  /* Thread panel - bottom drawer on mobile */
+  .thread-panel{width:100%;height:120px;border-left:none;border-top:1px solid #1a3a1a;flex-shrink:0}
+  .thread-header{padding:4px 8px;font-size:11px}
+  .thread-post{padding:4px 8px}
+  .thread-post .post-header{gap:4px}
+  .thread-post .post-id,.thread-post .post-name,.thread-post .post-date{font-size:9px}
+  .thread-post .post-body{font-size:10px;line-height:1.3}
+
+  /* Jerry panel */
+  .jerry-panel{right:0;left:0}
+  .jerry-panel.active{height:100px}
+  .jerry-panel .jerry-header{padding:3px 10px;font-size:10px}
+  .jerry-panel .jerry-avatar{width:18px;height:18px;font-size:10px}
+  .jerry-panel .jerry-text{padding:5px 10px;font-size:11px;max-height:65px}
+
+  /* Kirk text */
+  .kirk-text{right:10px;left:10px;width:auto;top:auto;bottom:130px;padding:8px}
+  .kirk-text .kirk-name{font-size:10px}
+  .kirk-text .kirk-msg{font-size:11px}
+
+  /* Buttons */
+  .start-btn{padding:10px 20px;font-size:14px;letter-spacing:2px;min-width:120px;min-height:44px}
+  .start-btn.boss{padding:12px 25px;font-size:16px}
+
+  /* Shell game */
+  .shell{font-size:40px}
+
+  /* Checkboxes */
+  .chaos-checkbox{padding:8px 10px;font-size:12px;min-height:40px}
+  .chaos-checkbox input[type="checkbox"]{width:20px;height:20px}
+
+  /* Sliders */
+  .chaos-slider-container{width:90%;left:5%}
+  .chaos-slider{height:40px}
+  .chaos-slider::-webkit-slider-thumb{width:30px;height:40px}
+  .slider-value{font-size:20px}
+
+  /* Data entry */
+  .data-entry-container{width:95%;left:50%;padding:15px}
+  .data-entry-title{font-size:14px}
+  .data-entry-field input{padding:10px;font-size:16px}
+
+  /* Tabbed keyboard */
+  .tabbed-keyboard .tab{padding:8px 12px;font-size:12px}
+
+  /* Ouija board */
+  .ouija-board{width:100%;max-width:320px;height:240px}
+  .ouija-letter{font-size:14px}
+
+  /* Passwordle */
+  .passwordle-cell{width:36px;height:36px;font-size:16px}
+  .passwordle-key{padding:10px 8px;font-size:12px;min-width:26px}
+
+  /* Captcha */
+  .captcha-container{width:95%;padding:12px}
+  .captcha-header{font-size:12px;padding:8px}
+  .captcha-grid{grid-template-columns:repeat(3,1fr)}
+  .captcha-cell{width:auto;height:80px}
+  .captcha-verify{padding:12px 30px;font-size:14px}
+
+  /* Achievement */
+  .achievement{min-width:200px;padding:10px 15px}
+  .achievement .ach-title{font-size:14px}
+  .achievement .ach-desc{font-size:10px}
+
+  /* CSD meter */
+  .csd-meter{top:auto;bottom:125px;left:10px;font-size:9px}
+  .csd-meter .csd-item{padding:2px 6px}
+
+  /* GBP display */
+  .gbp-display{top:auto;bottom:125px;right:10px;font-size:10px;padding:3px 8px}
+
+  /* SC box */
+  .sc-box{width:90%;max-width:none;padding:12px 15px;bottom:auto;top:50%;transform:translate(-50%,-50%)}
+  .sc-box .sc-title{font-size:12px}
+  .sc-box .sc-cat{font-size:24px}
+  .sc-box .sc-text{font-size:11px}
+  .sc-box button{padding:10px 20px;font-size:12px}
+
+  /* Victory */
+  .victory-text h1{font-size:32px}
+  .victory-text p{font-size:14px}
+  .victory-stats{padding:20px;width:90%}
+  .stat-line{font-size:12px}
+  .aura-line{font-size:16px}
+
+  /* Unredaction */
+  .unredact-overlay{padding:15px}
+  .unredact-doc{padding:15px;font-size:12px}
+  .unredact-classification{font-size:8px;letter-spacing:2px}
+  .unredact-title{font-size:14px;letter-spacing:2px}
+  .unredact-continue{padding:10px 25px;font-size:14px}
+}
+
+/* Extra small devices */
+@media screen and (max-width: 380px) {
+  #epilepsy-warning h1{font-size:22px}
+  #epilepsy-warning p{font-size:12px}
+  #epilepsy-warning button{padding:10px 20px;font-size:12px}
+
+  .game-topbar{padding:3px 5px}
+  .level-info .level-num{font-size:12px}
+  .timer-display{font-size:10px}
+
+  .start-btn{padding:8px 16px;font-size:12px;min-height:40px}
+
+  .thread-panel{height:100px}
+
+  .jerry-panel.active{height:80px}
+  .jerry-panel .jerry-text{font-size:10px}
+
+  .passwordle-cell{width:30px;height:30px;font-size:14px}
+  .passwordle-key{padding:8px 6px;font-size:10px;min-width:22px}
+
+  #transition-screen .glitch-text{font-size:22px}
+}
+
+/* Landscape mode on mobile */
+@media screen and (max-width: 768px) and (orientation: landscape) {
+  .game-topbar{min-height:30px;padding:2px 10px}
+  .kirk-meter{display:none}
+  .thread-panel{height:80px}
+  .jerry-panel.active{height:70px}
+  .game-arena{min-height:40vh}
+}
+
+/* Touch-friendly tap targets */
+@media (hover: none) and (pointer: coarse) {
+  .start-btn,.chaos-checkbox,.tabbed-keyboard .tab,.passwordle-key,.captcha-cell,.sc-box button,.unredact-continue,#terminal-start-btn,#warning-accept{
+    min-height:44px;
+    min-width:44px;
+  }
+  .chaos-checkbox{min-height:48px}
+  .shell{font-size:50px}
+}
