@@ -8,48 +8,21 @@ window.AUDIO = {
     try { this.ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
   },
 
-  // Background music - O Fortuna (Carmina Burana) - UC Davis University Chorus
+  // Background music - O Fortuna (Carmina Burana)
   startBGMusic() {
     if (this.bgMusicPlaying) return;
-    const self = this;
     try {
       this.bgMusic = new Audio('https://www.orangefreesounds.com/wp-content/uploads/2016/11/Carl-orff-carmina-burana.mp3');
-      this.bgMusic.crossOrigin = 'anonymous';
-      this.bgMusic.preload = 'auto';
       this.bgMusic.loop = true;
       this.bgMusic.volume = 0.3;
 
-      // Try to play immediately
-      const tryPlay = () => {
-        if (self.bgMusicPlaying) return;
-        self.bgMusic.play().then(() => {
-          self.bgMusicPlaying = true;
-          console.log('O FORTUNA ACTIVATED - genuinely epic. Kirk awaits.');
-        }).catch(e => {
-          console.log('Music blocked, waiting for interaction...', e.message);
-        });
-      };
-
-      // Wait for audio to be ready, then try
-      this.bgMusic.addEventListener('canplaythrough', tryPlay, { once: true });
-
-      // Also retry on any user interaction
-      const retryMusic = () => {
-        if (self.bgMusicPlaying) return;
-        self.bgMusic.play().then(() => {
-          self.bgMusicPlaying = true;
-          console.log('O FORTUNA ACTIVATED via interaction - genuinely epic.');
-          document.removeEventListener('click', retryMusic);
-          document.removeEventListener('touchstart', retryMusic);
-          document.removeEventListener('keydown', retryMusic);
-        }).catch(() => {});
-      };
-      document.addEventListener('click', retryMusic);
-      document.addEventListener('touchstart', retryMusic);
-      document.addEventListener('keydown', retryMusic);
-
-      // Try immediately too
-      tryPlay();
+      const self = this;
+      this.bgMusic.play().then(function() {
+        self.bgMusicPlaying = true;
+        console.log('O FORTUNA ACTIVATED');
+      }).catch(function(e) {
+        console.log('Music play failed:', e);
+      });
     } catch(e) {
       console.log('Music error:', e);
     }
