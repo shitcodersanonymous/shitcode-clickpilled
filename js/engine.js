@@ -154,14 +154,14 @@ function startLevel(idx){
 
 function showSC(){
   const box=$('#sc-box'),text=$('#sc-text');if(!box||!text)return;
-  text.textContent=pick(["A box. Help or suffering.","oi. box here. your call cunt.","Quantum state. Observe at own risk."]);
+  text.textContent=pick(["A cunt. Help or suffering.","oi. cunt here. your call.","Quantum cunt. Observe at own risk.","the cunt is watching. what do."]);
   text.style.color='#ccc';box.style.display='block';
   $('#sc-open').onclick=()=>{GAME.scEncounters++;
-    if(Math.random()<.45){text.textContent=pick(["button's near center. don't tell anyone.","I slowed it down for 5 seconds. GO.","genuine help: approach from the left."]);text.style.color='#0f0';addGBP(15);
-      THREAD.post("SC HELPFUL MODE "+String.fromCodePoint(0x1F438));
-    }else{text.textContent=pick(["yeah nah get fucked. 2x speed now.","haha. cunt mode. spawning 10 fakes.","I could have helped. chose not to. vibes."]);text.style.color='#f00';addGBP(-15);
+    if(Math.random()<.45){text.textContent=pick(["button's near center. don't tell anyone.","I slowed it down for 5 seconds. GO.","genuine help: approach from the left.","the cunt is feeling generous today."]);text.style.color='#0f0';addGBP(15);
+      THREAD.post("SCHRODINGER'S CUNT: HELPFUL MODE "+String.fromCodePoint(0x1F438));
+    }else{text.textContent=pick(["yeah nah get fucked. 2x speed now.","haha. full cunt mode activated.","I could have helped. chose not to. vibes.","the cunt has chosen violence."]);text.style.color='#f00';addGBP(-15);
       GAME.kirkHealth=Math.max(0,GAME.kirkHealth-8);updateKirkMeter();shakeScreen('hard');
-      THREAD.post(THREAD.greentext(['opened box','cunt mode','many such cases']));
+      THREAD.post(THREAD.greentext(['opened the cunt','full cunt mode','many such cases']));
     }addTimeout(()=>{box.style.display='none';},4000);
   };
   $('#sc-ignore').onclick=()=>{text.textContent="coward.";text.style.color='#888';addGBP(2);addTimeout(()=>{box.style.display='none';},2000);};
