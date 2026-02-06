@@ -11,20 +11,27 @@ window.AUDIO = {
   // Background music - O Fortuna (Carmina Burana)
   startBGMusic() {
     if (this.bgMusicPlaying) return;
+    var self = this;
     try {
       this.bgMusic = new Audio('audio/o-fortuna.mp3');
       this.bgMusic.loop = true;
-      this.bgMusic.volume = 0.3;
+      this.bgMusic.volume = 0.5;
 
-      const self = this;
-      this.bgMusic.play().then(function() {
-        self.bgMusicPlaying = true;
-        console.log('O FORTUNA ACTIVATED');
-      }).catch(function(e) {
-        console.log('Music play failed:', e);
+      this.bgMusic.addEventListener('error', function(e) {
+        alert('Audio error: ' + (self.bgMusic.error ? self.bgMusic.error.message : 'unknown'));
       });
+
+      this.bgMusic.addEventListener('canplay', function() {
+        self.bgMusic.play().then(function() {
+          self.bgMusicPlaying = true;
+        }).catch(function(e) {
+          alert('Play failed: ' + e.message);
+        });
+      });
+
+      this.bgMusic.load();
     } catch(e) {
-      console.log('Music error:', e);
+      alert('Music error: ' + e.message);
     }
   },
 
