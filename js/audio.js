@@ -12,7 +12,7 @@ window.AUDIO = {
   startBGMusic() {
     if (this.bgMusicPlaying) return;
     try {
-      this.bgMusic = new Audio('https://www.orangefreesounds.com/wp-content/uploads/2016/11/Carl-orff-carmina-burana.mp3');
+      this.bgMusic = new Audio('audio/o-fortuna.mp3');
       this.bgMusic.loop = true;
       this.bgMusic.volume = 0.3;
 
